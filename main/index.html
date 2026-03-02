@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Garcia | Music Links</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Smooth transitions for button hovers */
+        .link-card {
+            transition: all 0.3s ease;
+        }
+        .link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center py-12 px-4 font-sans">
+
+    <main class="w-full max-w-md flex flex-col items-center">
+        <img src="https://via.placeholder.com/150" alt="Artist Profile" class="w-32 h-32 rounded-full border-4 border-gray-700 shadow-lg mb-4 object-cover">
+        
+        <h1 class="text-3xl font-bold mb-2 tracking-wide">Gabriel Garcia</h1>
+        <p class="text-gray-400 text-center mb-8 px-4">Latest single "Far Away" out now on all major platforms. 🎧</p>
+
+        <div class="w-full flex flex-col space-y-4">
+            
+            <a href="#" class="link-card flex items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-[#1DB954] hover:bg-gray-750 group">
+                <i class="fa-brands fa-spotify text-2xl text-[#1DB954] w-10 text-center"></i>
+                <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#1DB954] transition-colors">Listen on Spotify</span>
+            </a>
+
+            <a href="#" class="link-card flex items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-[#FA243C] hover:bg-gray-750 group">
+                <i class="fa-brands fa-apple text-2xl text-[#FA243C] w-10 text-center"></i>
+                <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#FA243C] transition-colors">Apple Music</span>
+            </a>
+
+            <a href="#" class="link-card flex items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-[#FF0000] hover:bg-gray-750 group">
+                <i class="fa-brands fa-youtube text-2xl text-[#FF0000] w-10 text-center"></i>
+                <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#FF0000] transition-colors">Watch on YouTube</span>
+            </a>
+
+            <a href="#" class="link-card flex items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-[#FF5500] hover:bg-gray-750 group">
+                <i class="fa-brands fa-soundcloud text-2xl text-[#FF5500] w-10 text-center"></i>
+                <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#FF5500] transition-colors">SoundCloud</span>
+            </a>
+
+        </div>
+
+        <button id="shareBtn" class="mt-10 px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition-colors flex items-center space-x-2">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>Share Profile</span>
+        </button>
+    </main>
+
+    <footer class="mt-auto pt-10 text-gray-500 text-sm">
+        <p>&copy; <span id="year"></span> Gabriel Garcia. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Set dynamic copyright year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Share button logic
+        const shareBtn = document.getElementById('shareBtn');
+        shareBtn.addEventListener('click', async () => {
+            const shareData = {
+                title: 'Gabriel Garcia | Music Links',
+                text: 'Check out my latest music across all platforms!',
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback for browsers that don't support the Web Share API
+                    navigator.clipboard.writeText(window.location.href);
+                    const originalText = shareBtn.innerHTML;
+                    shareBtn.innerHTML = '<i class="fa-solid fa-check"></i><span>Link Copied!</span>';
+                    setTimeout(() => {
+                        shareBtn.innerHTML = originalText;
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        });
+    </script>
+</body>
+</html>
