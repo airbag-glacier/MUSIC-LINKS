@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Removed the period before body to correctly target the HTML tag */
         body {
             background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
         }
@@ -38,12 +37,15 @@
 <body class="text-gray-100 min-h-screen flex flex-col items-center py-12 px-4 font-sans">
 
     <main class="w-full max-w-md flex flex-col items-center">
-<img src="755b9ca4-b078-418e-985f-dd28986cd113.jpg" alt="Gabriel Garcia" class="w-32 h-32 rounded-full border-4 border-gray-700 shadow-lg mb-4 object-cover object-center">        
+        <img src="755b9ca4-b078-418e-985f-dd28986cd113.jpg" alt="Gabriel Garcia" class="w-32 h-32 rounded-full border-4 border-gray-700 shadow-lg mb-4 object-cover object-center">        
         <h1 class="text-3xl font-bold mb-2 tracking-wide">Gabriel Garcia</h1>
-        <p class="text-gray-400 text-center mb-8 px-4">Latest single "Far Away" out now on all major platforms. 🎧</p>
+        
+        <!-- Added an ID here so JavaScript can change the text automatically -->
+        <p id="dynamic-subtitle" class="text-gray-400 text-center mb-8 px-4">Loading latest release... 🎧</p>
 
         <div class="w-full flex flex-col space-y-4">
             
+            <!-- Button Links (Kept the same) -->
             <a href="https://open.spotify.com/artist/0czgfH1L4qDxX1VBcrNw69" class="link-card flex items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-[#1DB954] hover:bg-gray-750 group">
                 <i class="fa-brands fa-spotify text-2xl text-[#1DB954] w-10 text-center"></i>
                 <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#1DB954] transition-colors">Listen on Spotify</span>
@@ -64,23 +66,26 @@
                 <span class="flex-grow font-semibold text-lg text-center pr-10 group-hover:text-[#FF5500] transition-colors">SoundCloud</span>
             </a>
 
-            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/09OFKRqtlm6OTTK7bRM6CD?utm_source=generator&theme=0" 
+            <!-- DYNAMIC SPOTIFY EMBED: Changed from /track/... to /artist/... -->
+            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/0czgfH1L4qDxX1VBcrNw69?utm_source=generator&theme=0" 
             width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
             loading="lazy"></iframe>
 
-            <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="175" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" 
-            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" 
-            src="https://embed.music.apple.com/us/song/far-away/1872453679"></iframe>
+            <!-- DYNAMIC APPLE MUSIC EMBED: Empty container filled by JS below -->
+            <div id="apple-embed-container"></div>
 
+            <!-- DYNAMIC YOUTUBE EMBED: See notes below on how to update this URL -->
             <iframe width="100%" height="250" src="https://www.youtube-nocookie.com/embed/IKT5kiat6gY?si=KnuQOug24si12hdx" title="YouTube video player" frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
+            <!-- SOUNDCLOUD EMBED -->
             <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" 
             src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1704461109&color=%23545454&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
             <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
                 <a href="https://soundcloud.com/gabriel-garcia-407956635" title="Gabriel Garcia" target="_blank" style="color: #cccccc; text-decoration: none;">Gabriel Garcia</a> · 
-                <a href="https://soundcloud.com/gabriel-garcia-407956635/far-away" title="Far Away" target="_blank" style="color: #cccccc; text-decoration: none;">Far Away</a></div>
+                <a href="https://soundcloud.com/gabriel-garcia-407956635/far-away" title="Far Away" target="_blank" style="color: #cccccc; text-decoration: none;">Far Away</a>
+            </div>
 
         </div>
 
@@ -98,7 +103,50 @@
         // Set dynamic copyright year
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Share button logic
+        // --- FETCH DYNAMIC LATEST TRACK FROM APPLE MUSIC ---
+        // Note: Because "Gabriel Garcia" is a common name, we search for the specific track "Far Away" 
+        // to find your unique artist ID, then fetch your latest releases from that ID.
+        
+        const itunesSearchUrl = 'https://itunes.apple.com/search?term=Gabriel+Garcia+Far+Away&entity=musicTrack&limit=1';
+
+        fetch(itunesSearchUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results && data.results.length > 0) {
+                    const artistId = data.results[0].artistId;
+                    
+                    // Now fetch the latest tracks by your specific Artist ID
+                    return fetch(`https://itunes.apple.com/lookup?id=${artistId}&entity=song&limit=5&sort=recent`);
+                } else {
+                    throw new Error("Artist not found");
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // The first result is the artist, subsequent results are tracks
+                if (data.results && data.results.length > 1) {
+                    // Filter out the artist object to just get songs, then sort by release date
+                    const songs = data.results.filter(item => item.wrapperType === 'track');
+                    const latestTrack = songs.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))[0];
+                    
+                    // Update the text dynamically
+                    document.getElementById('dynamic-subtitle').innerHTML = `Latest single "${latestTrack.trackName}" out now on all major platforms. 🎧`;
+
+                    // Inject the dynamic Apple Music iframe
+                    document.getElementById('apple-embed-container').innerHTML = `
+                        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="175" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" 
+                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" 
+                        src="https://embed.music.apple.com/us/album/${latestTrack.collectionId}?i=${latestTrack.trackId}"></iframe>
+                    `;
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching latest track:", err);
+                // Fallback text if the API fails
+                document.getElementById('dynamic-subtitle').innerHTML = `Listen to my music on all major platforms. 🎧`;
+            });
+
+        // --- Share button logic ---
         const shareBtn = document.getElementById('shareBtn');
         shareBtn.addEventListener('click', async () => {
             const shareData = {
